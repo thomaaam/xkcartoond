@@ -6,6 +6,7 @@
 import Foundation
 import Alamofire
 import AlamofireObjectMapper
+import EmitterKit
 
 class CartoonNumberTooHighError: Error { }
 
@@ -14,8 +15,15 @@ class CartoonManager {
    private let baseUrl: String
    private let urlSuffix: String
 
-   var currentCartoonModel: CartoonModel?
-   var cartoonModels: Array<CartoonModel>
+   var currentCartoonModel: CartoonModel? {
+      didSet {
+         currentCartoonEvent.emit(currentCartoonModel)
+      }
+   }
+   private var cartoonModelsArray: Array<CartoonModel>
+   private var cartoonModels: Dictionary<Int, CartoonModel>
+   var cartoonsEvent: Event<Int>
+   var currentCartoonEvent: Event<CartoonModel?> // TODO? Might remove this
 
    private static var currentInstance: CartoonManager?
    static var instance: CartoonManager {
@@ -28,10 +36,23 @@ class CartoonManager {
       }
    }
 
+   static func getCartoon(fromDictWithIndex index: Int) -> CartoonModel? {
+      return instance.cartoonModels[index]
+   }
+   static func getCartoon(fromArrayWithIndex index: Int) -> CartoonModel? {
+      if instance.cartoonModelsArray.count <= index {
+         return nil
+      }
+      return instance.cartoonModelsArray[index]
+   }
+
    init() {
       baseUrl = "https://xkcd.com/"
       urlSuffix = "info.0.json"
-      cartoonModels = Array.init()
+      cartoonModels = Dictionary()
+      cartoonModelsArray = Array()
+      cartoonsEvent = Event()
+      currentCartoonEvent = Event()
    }
 
    func setup() {
@@ -46,13 +67,13 @@ class CartoonManager {
       }
    }
 
-   private var numCartoons: Int? {
+   var numCartoons: Int? {
       get {
          return currentCartoonModel?.number
       }
    }
 
-   private var numCachedCartoons: Int {
+   var numCachedCartoons: Int {
       get {
          return cartoonModels.count
       }
@@ -63,14 +84,35 @@ class CartoonManager {
       return "\(baseUrl)\(cartoonNumber)\(urlSuffix)"
    }
 
-   func loadCartoon(withNumber num: Int?, completion: @escaping (CartoonModel?, Error?) -> Void) {
+   // TODO: Store to device as well, then restore on startup
+   private func storeCartoon(_ cartoonModel: CartoonModel) {
+      // We are dependent on the cartoon number
+      guard let number = cartoonModel.number else {
+         return
+      }
+      // Already exists. Do nothing
+      if let cm = cartoonModels[number] {
+         return
+      }
+      cartoonModels.updateValue(cartoonModel, forKey: number)
+      cartoonModelsArray.append(cartoonModel)
+      cartoonsEvent.emit(number)
+   }
+
+   func loadCartoon(withNumber num: Int?, completion: ((CartoonModel?, Error?) -> Void)? = nil) {
       if let nc = numCartoons, let n = num {
          if nc < n {
-            completion(nil, CartoonNumberTooHighError())
+            completion?(nil, CartoonNumberTooHighError())
             return
          }
       }
-      loadCartoon(withUrl: getCartoonUrl(num), completion: completion)
+      loadCartoon(withUrl: getCartoonUrl(num)) {
+         [weak self] cm, err in
+         if let cartoonModel = cm {
+            self?.storeCartoon(cartoonModel)
+         }
+         completion?(cm, err)
+      }
    }
 
    private func loadCartoon(withUrl url: String, completion: @escaping (CartoonModel?, Error?) -> Void) {

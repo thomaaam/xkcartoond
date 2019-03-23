@@ -6,6 +6,7 @@
 import Foundation
 import UIKit
 import SnapKit
+import EmitterKit
 
 // TODO: Implement the overrides (and then probably some more overrides)
 
@@ -13,6 +14,7 @@ class CartoonContainerVC : UICollectionViewController, UICollectionViewDelegateF
 
    let inset: CGFloat = 10
    let numColumns: CGFloat = 2
+   var cartoonsListener: EventListener<Int>!
 
    required init?(coder aDecoder: NSCoder) {
       super.init(coder: aDecoder)
@@ -27,6 +29,12 @@ class CartoonContainerVC : UICollectionViewController, UICollectionViewDelegateF
 
       collectionView?.backgroundColor = .white
       collectionView?.register(CartoonViewCell.self, forCellWithReuseIdentifier: CartoonViewCell.key)
+
+      cartoonsListener = CartoonManager.instance.cartoonsEvent.on {
+         [weak self] cm in
+
+         self?.collectionView.reloadData()
+      }
    }
 
    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
@@ -41,11 +49,14 @@ class CartoonContainerVC : UICollectionViewController, UICollectionViewDelegateF
    }
 
    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-      return 6 // TODO
+      return CartoonManager.instance.numCachedCartoons
    }
 
    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
       var cell = collectionView.dequeueReusableCell(withReuseIdentifier: CartoonViewCell.key, for: indexPath)
+      if let c = cell as? CartoonViewCell {
+         c.setup(index: indexPath.row)
+      }
       return cell
    }
 }
