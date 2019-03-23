@@ -8,8 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		1D9653C348C258ABB1442A28 /* Pods_xkcartoond.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52399FC03E8617AFDDF95D16 /* Pods_xkcartoond.framework */; };
+		5327EB091BF74883FAC26ECE /* CartoonViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327ED50E9AA615894672F46 /* CartoonViewCell.swift */; };
+		5327EB4F1B231C154DB5A7B8 /* CartoonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327ED1C0C389C21E4D3C6DD /* CartoonModel.swift */; };
+		5327EBB4520E48D324B259AB /* CartoonContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327EADA20A8CE6A153D6A04 /* CartoonContainerVC.swift */; };
+		5327EBD79E4FE00053D800DA /* CartoonManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327EC09078F7DFA83391D7A /* CartoonManager.swift */; };
 		ADA90AD622456B3700CA1FC8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA90AD522456B3700CA1FC8 /* AppDelegate.swift */; };
-		ADA90AD822456B3700CA1FC8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA90AD722456B3700CA1FC8 /* ViewController.swift */; };
+		ADA90AD822456B3700CA1FC8 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA90AD722456B3700CA1FC8 /* RootViewController.swift */; };
 		ADA90ADE22456B3700CA1FC8 /* xkcartoond.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ADA90ADC22456B3700CA1FC8 /* xkcartoond.xcdatamodeld */; };
 		ADA90AE022456B3800CA1FC8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADA90ADF22456B3800CA1FC8 /* Assets.xcassets */; };
 		ADA90AE322456B3800CA1FC8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ADA90AE122456B3800CA1FC8 /* LaunchScreen.storyboard */; };
@@ -31,10 +35,14 @@
 		0AA22F5AAB60D91C04712403 /* Pods-xkcartoondTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xkcartoondTests.release.xcconfig"; path = "Target Support Files/Pods-xkcartoondTests/Pods-xkcartoondTests.release.xcconfig"; sourceTree = "<group>"; };
 		47DEF2861D1B3E4B4329DA05 /* Pods_xkcartoondTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xkcartoondTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52399FC03E8617AFDDF95D16 /* Pods_xkcartoond.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xkcartoond.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5327EADA20A8CE6A153D6A04 /* CartoonContainerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartoonContainerVC.swift; sourceTree = "<group>"; };
+		5327EC09078F7DFA83391D7A /* CartoonManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartoonManager.swift; sourceTree = "<group>"; };
+		5327ED1C0C389C21E4D3C6DD /* CartoonModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartoonModel.swift; sourceTree = "<group>"; };
+		5327ED50E9AA615894672F46 /* CartoonViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartoonViewCell.swift; sourceTree = "<group>"; };
 		6DDC3D4938DA2931FB32C042 /* Pods-xkcartoond.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xkcartoond.debug.xcconfig"; path = "Target Support Files/Pods-xkcartoond/Pods-xkcartoond.debug.xcconfig"; sourceTree = "<group>"; };
 		ADA90AD222456B3700CA1FC8 /* xkcartoond.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xkcartoond.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADA90AD522456B3700CA1FC8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		ADA90AD722456B3700CA1FC8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		ADA90AD722456B3700CA1FC8 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		ADA90ADD22456B3700CA1FC8 /* xkcartoond.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = xkcartoond.xcdatamodel; sourceTree = "<group>"; };
 		ADA90ADF22456B3800CA1FC8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ADA90AE222456B3800CA1FC8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -75,6 +83,45 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		5327E118018D6F191E934C77 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		5327E25839D4D898C80BCEF8 /* Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				5327EC09078F7DFA83391D7A /* CartoonManager.swift */,
+			);
+			path = Infrastructure;
+			sourceTree = "<group>";
+		};
+		5327E9828313D2CF78578CD3 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				5327EADA20A8CE6A153D6A04 /* CartoonContainerVC.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		5327EA0BCB8632314CB9053A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5327ED1C0C389C21E4D3C6DD /* CartoonModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5327ED26663B0F5E844F4E57 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5327ED50E9AA615894672F46 /* CartoonViewCell.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		ADA90AC922456B3700CA1FC8 = {
 			isa = PBXGroup;
 			children = (
@@ -99,11 +146,16 @@
 			isa = PBXGroup;
 			children = (
 				ADA90AD522456B3700CA1FC8 /* AppDelegate.swift */,
-				ADA90AD722456B3700CA1FC8 /* ViewController.swift */,
+				ADA90AD722456B3700CA1FC8 /* RootViewController.swift */,
 				ADA90ADF22456B3800CA1FC8 /* Assets.xcassets */,
 				ADA90AE122456B3800CA1FC8 /* LaunchScreen.storyboard */,
 				ADA90AE422456B3800CA1FC8 /* Info.plist */,
 				ADA90ADC22456B3700CA1FC8 /* xkcartoond.xcdatamodeld */,
+				5327E9828313D2CF78578CD3 /* ViewControllers */,
+				5327ED26663B0F5E844F4E57 /* Views */,
+				5327E118018D6F191E934C77 /* Extensions */,
+				5327EA0BCB8632314CB9053A /* Models */,
+				5327E25839D4D898C80BCEF8 /* Infrastructure */,
 			);
 			path = xkcartoond;
 			sourceTree = "<group>";
@@ -260,6 +312,7 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-xkcartoond/Pods-xkcartoond-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/AlamofireImage/AlamofireImage.framework",
 				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 				"${BUILT_PRODUCTS_DIR}/MBProgressHUD/MBProgressHUD.framework",
 				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
@@ -270,6 +323,7 @@
 			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AlamofireImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MBProgressHUD.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
@@ -310,8 +364,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				ADA90ADE22456B3700CA1FC8 /* xkcartoond.xcdatamodeld in Sources */,
-				ADA90AD822456B3700CA1FC8 /* ViewController.swift in Sources */,
+				ADA90AD822456B3700CA1FC8 /* RootViewController.swift in Sources */,
 				ADA90AD622456B3700CA1FC8 /* AppDelegate.swift in Sources */,
+				5327EBB4520E48D324B259AB /* CartoonContainerVC.swift in Sources */,
+				5327EB4F1B231C154DB5A7B8 /* CartoonModel.swift in Sources */,
+				5327EB091BF74883FAC26ECE /* CartoonViewCell.swift in Sources */,
+				5327EBD79E4FE00053D800DA /* CartoonManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

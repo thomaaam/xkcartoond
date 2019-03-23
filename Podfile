@@ -9,7 +9,8 @@ target 'xkcartoond' do
 
   # Pods for xkcartoond
   pod 'SnapKit', '~> 4.0'
-  pod 'Alamofire', '~> 5.0.0-beta.2'
+  pod 'Alamofire', '~> 4.8.0'
+  pod 'AlamofireImage'
   pod 'Kingfisher'
   pod 'SwiftyJSON', '~> 4.0'
   pod 'MBProgressHUD', '~> 1.1.0'
