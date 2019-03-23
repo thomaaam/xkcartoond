@@ -4,31 +4,41 @@
 //
 
 import Foundation
+import ObjectMapper
 
-// TODO: Set the data based on this URL:
-// https://xkcd.com/<index>/info.0.json
+class CartoonModel: NSObject, Mappable {
 
-class CartoonModel {
+   var number: Int?
+   var month: String?
+   var year: String?
+   var day: String?
+   var news: String?
+   var safeTitle: String?
+   var transcript: String?
+   var alt: String?
+   var imgUrl: String?
+   var title: String?
+   var link: String?
 
-   var month: Int
-   var year: Int
-   var day: Int
-   var news: String
-   var safeTitle: String
-   var transcript: String
-   var alt: String
-   var imgUrl: String
-   var title: String
+   override init() {
+      super.init()
+   }
 
-   init(index: Int) {
-      month = 0
-      year = 0
-      day = 0
-      news = ""
-      safeTitle = ""
-      transcript = ""
-      alt = ""
-      imgUrl = ""
-      title = ""
+   convenience required init?(map: Map) {
+      self.init()
+   }
+
+   func mapping(map: Map) {
+      number <- map["num"]
+      month <- map["month"]
+      year <- map["year"]
+      day <- map["day"]
+      news <- map["news"]
+      safeTitle <- map["safe_title"]
+      transcript <- map["transcript"]
+      alt <- map["alt"]
+      imgUrl <- map["img"]
+      title <- map["title"]
+      link <- map["link"]
    }
 }

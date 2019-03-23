@@ -11,8 +11,8 @@ target 'xkcartoond' do
   pod 'SnapKit', '~> 4.0'
   pod 'Alamofire', '~> 4.8.0'
   pod 'AlamofireImage'
+  pod 'AlamofireObjectMapper'
   pod 'Kingfisher'
-  pod 'SwiftyJSON', '~> 4.0'
   pod 'MBProgressHUD', '~> 1.1.0'
 
   target 'xkcartoondTests' do
