@@ -51,7 +51,8 @@ class CartoonViewCell: UICollectionViewCell {
 
    func setup(index: Int) {
       guard let cm = CartoonManager.getCartoon(fromDictByIndex: index),
-            let imgUrl = cm.imgUrl else {
+            let imgUrl = cm.imgUrl,
+            let number = cm.number else {
          print("setup(\(index))", "Cartoon not ready")
          // TODO: Set placeholder image somehow
          return
@@ -59,9 +60,22 @@ class CartoonViewCell: UICollectionViewCell {
       let url = URL(string: imgUrl)!
       //let placeholderImage = UIImage(named: "placeholder")! // TODO
 
-      cartoonImage?.af_setImage(withURL: url/*, placeholderImage: placeholderImage*/)
+      print("setup(\(index))", "Set image \(url) \(String(describing: cartoonImage))")
 
-      print("setup(\(index))", "Set image \(url)")
+      cartoonImage?.af_setImage(withURL: url/*, placeholderImage: placeholderImage*/) {
+         [weak self] response in
+         // TODO: Manage caching
+         /*
+         switch(response.result) {
+         case .success(let image):
+            StorageManager.instance.storeCartoonImage(byNumber: number, image: image)
+         case .failure(let error):
+            if let cached = StorageManager.instance.getCartoonImage(byNumber: number) {
+               self?.cartoonImage?.image = cached
+            }
+         }
+         */
+      }
    }
 }
 

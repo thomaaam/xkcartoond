@@ -15,12 +15,9 @@ class CartoonManager {
    private let baseUrl: String
    private let urlSuffix: String
 
-   var currentCartoonModel: CartoonModel?
-   private var cartoonModels: Dictionary<Int, CartoonModel>
    var cartoonsEvent: Event<Int>
-   var lastRequestedCartoon: Int?
-   let cartoonBathNumber: Int = 5
    private var dataRequests: Dictionary<String, DataRequest>
+   private(set) var numCartoons: Int?
 
    private static var currentInstance: CartoonManager?
    static var instance: CartoonManager {
@@ -36,7 +33,7 @@ class CartoonManager {
    static func getCartoon(fromDictByIndex index: Int) -> CartoonModel? {
       if let count = instance.numCartoons {
          let number = count - index
-         if let c = instance.cartoonModels[number] {
+         if let c = StorageManager.instance.getCartoon(byNumber: number) {
             print("[getCartoon(\(index))]", "Returning cached \(number):\(c)")
             return c
          }
@@ -52,35 +49,38 @@ class CartoonManager {
    init() {
       baseUrl = "https://xkcd.com/"
       urlSuffix = "info.0.json"
-      cartoonModels = Dictionary()
       cartoonsEvent = Event()
       dataRequests = Dictionary()
    }
 
    func setup() {
+
       // Load current cartoon
       loadCartoon(withNumber: nil) {
          [weak self] cm, err in
-         guard let s = self else {
-            return
-         }
-         s.currentCartoonModel = cm
 
+         // Ops, something went wrong.. Are you offline?
+         // TODO: Add check if the error was raised due to connectivity
          if let e = err {
-            // TODO: Do something?
+            print("setup()", "Error=\(e)")
+            self?.trySetupOffline()
+         }
+         else if let cartoonModel = cm {
+            // Set the maximum number of existing cartoons
+            self?.numCartoons = cartoonModel.number
+
+            // Store another reference to the root cartoon (representing the latest published one)
+            StorageManager.instance.storeCartoon(model: cartoonModel,
+                  forKey: StorageManager.RootCartoonKey)
          }
       }
    }
 
-   var numCartoons: Int? {
-      get {
-         return currentCartoonModel?.number
-      }
-   }
-
-   var numCachedCartoons: Int {
-      get {
-         return cartoonModels.count
+   func trySetupOffline() {
+      if let cached = StorageManager.instance.getCartoon(forKey: StorageManager.RootCartoonKey) {
+         numCartoons = cached.number
+         cartoonsEvent.emit(cached.number ?? 0) // Manually trigger data source reload
+         return
       }
    }
 
@@ -89,35 +89,46 @@ class CartoonManager {
       return "\(baseUrl)\(cartoonNumber)\(urlSuffix)"
    }
 
-   // TODO: Store to device as well, then restore on startup
-   private func storeCartoon(_ cartoonModel: CartoonModel) {
-      // We are dependent on the cartoon number
-      guard let number = cartoonModel.number else {
+   private func storeCartoon(model: CartoonModel?) {
+
+      // We're dependent on the number
+      guard let mod = model,
+            let num = mod.number else {
          return
       }
-      // Already exists. Do nothing
-      if let cm = cartoonModels[number] {
-         return
+      // Only store if it does not exist
+      if StorageManager.instance.getCartoon(byNumber: num) == nil {
+         StorageManager.instance.storeCartoon(model: mod)
       }
-      cartoonModels.updateValue(cartoonModel, forKey: number)
-      cartoonsEvent.emit(number)
+      // Trigger the data source to reload
+      cartoonsEvent.emit(num)
    }
 
-   func loadCartoon(withNumber num: Int?, completion: ((CartoonModel?, Error?) -> Void)? = nil) {
-      if let nc = numCartoons, let n = num {
-         if nc < n {
-            completion?(nil, CartoonNumberTooHighError())
+   func loadCartoon(withNumber number: Int?, completion: ((CartoonModel?, Error?) -> Void)? = nil) {
+      if let num = number {
+         if let nc = numCartoons {
+            // There does not exist any cartoon with this number identifier yet
+            if nc < num {
+               completion?(nil, CartoonNumberTooHighError())
+               return
+            }
+         }
+
+         // Check if cartoon is stored on disk already
+         if let cartoon = StorageManager.instance.getCartoon(byNumber: num) {
+            print("loadCartoon(\(String(describing: num)))", "Cartoon loaded from storage")
+            storeCartoon(model: cartoon)
+            completion?(cartoon, nil)
             return
          }
-         lastRequestedCartoon = n
       }
 
-      let _ = requestCartoon(withNumber: num) {
+      // If all above fails, request it
+      let _ = requestCartoon(withNumber: number) {
          [weak self] cm, err in
 
-         if let cartoonModel = cm {
-            self?.storeCartoon(cartoonModel)
-         }
+         print("loadCartoon(\((String(describing: number))))", "Cartoon requested")
+         self?.storeCartoon(model: cm)
          completion?(cm, err)
       }
    }
@@ -125,7 +136,7 @@ class CartoonManager {
    private func requestCartoon(withNumber num: Int?, completion: @escaping (CartoonModel?, Error?) -> Void) -> DataRequest? {
       let url = getCartoonUrl(num)
       if let dr = dataRequests[url] {
-         print("requestCartoon (\(num))", "Request processing (\(dr.progress))")
+         print("requestCartoon (\((String(describing: num))))", "Request processing (\(dr.progress))")
          return nil
       }
       let request = Alamofire.request(url).validate().responseObject {
@@ -133,7 +144,7 @@ class CartoonManager {
 
          switch response.result {
          case .success:
-            print("requestCartoon (\(num))", "Request success")
+            print("requestCartoon (\((String(describing: num))))", "Request success")
             completion(response.result.value, nil)
          case .failure(let error):
 
@@ -143,11 +154,11 @@ class CartoonManager {
                s.dataRequests.removeValue(forKey: absoluteUrl)
             }
 
-            print("requestCartoon (\(num))", "Request failed: \(error)")
+            print("requestCartoon (\((String(describing: num))))", "Request failed: \(error)")
             completion(nil, error)
          }
       }
-      print("requestCartoon (\(num))", "Request starting")
+      print("requestCartoon (\((String(describing: num))))", "Request starting")
       dataRequests[url] = request
       return request
    }

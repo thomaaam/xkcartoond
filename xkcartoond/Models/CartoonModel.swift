@@ -6,7 +6,7 @@
 import Foundation
 import ObjectMapper
 
-class CartoonModel: NSObject, Mappable {
+class CartoonModel: NSObject, Mappable, Codable {
 
    var number: Int?
    var month: String?

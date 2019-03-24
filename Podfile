@@ -15,6 +15,7 @@ target 'xkcartoond' do
   pod 'Kingfisher'
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'EmitterKit'
+  pod 'Cache'
 
   target 'xkcartoondTests' do
     inherit! :search_paths

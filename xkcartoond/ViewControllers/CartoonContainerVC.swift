@@ -32,10 +32,10 @@ class CartoonContainerVC : UICollectionViewController,
       collectionView?.register(CartoonViewCell.self, forCellWithReuseIdentifier: CartoonViewCell.key)
 
       cartoonsListener = CartoonManager.instance.cartoonsEvent.on {
-         [weak self] cm in
-
-         print("cartoonsEvent", "Data changed. Count=\(CartoonManager.instance.numCartoons)")
-         self?.collectionView?.reloadData()
+         [weak self] _ in
+         DispatchQueue.main.async {
+            self?.collectionView?.reloadData()
+         }
       }
    }
 
@@ -55,8 +55,9 @@ class CartoonContainerVC : UICollectionViewController,
    }
 
    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-      var cell = collectionView.dequeueReusableCell(withReuseIdentifier: CartoonViewCell.key, for: indexPath)
+      let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CartoonViewCell.key, for: indexPath)
       if let c = cell as? CartoonViewCell {
+         print("cellForItemAt(\(indexPath.row))")
          c.setup(index: indexPath.row)
       }
       return cell
