@@ -18,6 +18,7 @@ class CartoonViewCell: UICollectionViewCell {
    }
 
    var cartoonImage: UIImageView?
+   let elevation: Int = 10
 
    required init?(coder aDecoder: NSCoder) {
       super.init(coder: aDecoder)
@@ -30,6 +31,15 @@ class CartoonViewCell: UICollectionViewCell {
 
       cartoonImage = UIImageView()
       cartoonImage!.contentMode = .scaleAspectFit
+
+      // Apply some elevation
+      if let layer = cartoonImage?.layer {
+         layer.masksToBounds = false
+         layer.shadowColor = UIColor.black.cgColor
+         layer.shadowOffset = CGSize(width: 0, height: elevation)
+         layer.shadowRadius = CGFloat(elevation)
+         layer.shadowOpacity = 0.5
+      }
 
       contentView.addSubview(cartoonImage!)
 
@@ -52,6 +62,7 @@ class CartoonViewCell: UICollectionViewCell {
       //let placeholderImage = UIImage(named: "placeholder")! // TODO
 
       cartoonImage?.af_setImage(withURL: url/*, placeholderImage: placeholderImage*/)
+
       print("setup(\(index))", "Set image \(url)")
    }
 }

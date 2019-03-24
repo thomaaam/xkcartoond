@@ -8,8 +8,6 @@ import UIKit
 import SnapKit
 import EmitterKit
 
-// TODO: Implement the overrides (and then probably some more overrides)
-
 class CartoonContainerVC : UICollectionViewController,
       UICollectionViewDelegateFlowLayout, UICollectionViewDataSourcePrefetching {
 
@@ -65,7 +63,7 @@ class CartoonContainerVC : UICollectionViewController,
    }
 
    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-      print("Fetch data for these indices: \(indexPaths)")
+      print("Prefetch data for these indices: \(indexPaths)")
       for i in 0..<indexPaths.count {
          let _ = CartoonManager.getCartoon(fromDictByIndex: indexPaths[i].row)
       }
