@@ -26,7 +26,7 @@ class CartoonViewCell: UICollectionViewCell {
    override init(frame: CGRect) {
       super.init(frame: frame)
 
-      contentView.backgroundColor = .red
+      //contentView.backgroundColor = .red
 
       cartoonImage = UIImageView()
       cartoonImage!.contentMode = .scaleAspectFit
