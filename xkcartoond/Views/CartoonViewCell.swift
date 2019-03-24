@@ -29,13 +29,15 @@ class CartoonViewCell: UICollectionViewCell {
       contentView.backgroundColor = .red
 
       cartoonImage = UIImageView()
-      cartoonImage!.contentMode = .center
+      cartoonImage!.contentMode = .scaleAspectFit
 
       contentView.addSubview(cartoonImage!)
 
       cartoonImage!.snp.makeConstraints {
          m in
          m.center.equalToSuperview()
+         m.width.equalToSuperview()
+         m.height.equalToSuperview()
       }
    }
 

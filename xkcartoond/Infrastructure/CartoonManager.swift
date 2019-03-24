@@ -15,15 +15,12 @@ class CartoonManager {
    private let baseUrl: String
    private let urlSuffix: String
 
-   var currentCartoonModel: CartoonModel? {
-      didSet {
-         currentCartoonEvent.emit(currentCartoonModel)
-      }
-   }
+   var currentCartoonModel: CartoonModel?
    private var cartoonModelsArray: Array<CartoonModel>
    private var cartoonModels: Dictionary<Int, CartoonModel>
    var cartoonsEvent: Event<Int>
-   var currentCartoonEvent: Event<CartoonModel?> // TODO? Might remove this
+   var lastRequestedCartoon: Int?
+   let cartoonBathNumber: Int = 10
 
    private static var currentInstance: CartoonManager?
    static var instance: CartoonManager {
@@ -52,17 +49,26 @@ class CartoonManager {
       cartoonModels = Dictionary()
       cartoonModelsArray = Array()
       cartoonsEvent = Event()
-      currentCartoonEvent = Event()
    }
 
    func setup() {
       // Load current cartoon
       loadCartoon(withNumber: nil) {
          [weak self] cm, err in
-         self?.currentCartoonModel = cm
+         guard let s = self else {
+            return
+         }
+         s.currentCartoonModel = cm
 
          if let e = err {
             // TODO: Do something?
+
+         } else if let current = cm  {
+            // Update last requested cartoon number
+            s.lastRequestedCartoon = current.number
+
+            // Start fetching more cartoons
+            s.loadNextCartoonBatch()
          }
       }
    }
@@ -82,6 +88,15 @@ class CartoonManager {
    private func getCartoonUrl(_ num: Int? = nil) -> String {
       let cartoonNumber = num != nil ? "\(num!)/" : ""
       return "\(baseUrl)\(cartoonNumber)\(urlSuffix)"
+   }
+
+   private func loadNextCartoonBatch() {
+      guard let index = lastRequestedCartoon else {
+         return
+      }
+      for i in 1...cartoonBathNumber {
+         loadCartoon(withNumber: index - i)
+      }
    }
 
    // TODO: Store to device as well, then restore on startup
@@ -105,7 +120,9 @@ class CartoonManager {
             completion?(nil, CartoonNumberTooHighError())
             return
          }
+         lastRequestedCartoon = n
       }
+
       loadCartoon(withUrl: getCartoonUrl(num)) {
          [weak self] cm, err in
          if let cartoonModel = cm {
