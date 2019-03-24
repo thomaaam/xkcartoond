@@ -16,11 +16,11 @@ class CartoonManager {
    private let urlSuffix: String
 
    var currentCartoonModel: CartoonModel?
-   private var cartoonModelsArray: Array<CartoonModel>
    private var cartoonModels: Dictionary<Int, CartoonModel>
    var cartoonsEvent: Event<Int>
    var lastRequestedCartoon: Int?
-   let cartoonBathNumber: Int = 10
+   let cartoonBathNumber: Int = 5
+   private var dataRequests: Dictionary<String, DataRequest>
 
    private static var currentInstance: CartoonManager?
    static var instance: CartoonManager {
@@ -33,22 +33,28 @@ class CartoonManager {
       }
    }
 
-   static func getCartoon(fromDictWithIndex index: Int) -> CartoonModel? {
-      return instance.cartoonModels[index]
-   }
-   static func getCartoon(fromArrayWithIndex index: Int) -> CartoonModel? {
-      if instance.cartoonModelsArray.count <= index {
-         return nil
+   static func getCartoon(fromDictByIndex index: Int) -> CartoonModel? {
+      if let count = instance.numCartoons {
+         let number = count - index
+         if let c = instance.cartoonModels[number] {
+            print("[getCartoon(\(index))]", "Returning cached \(number):\(c)")
+            return c
+         }
+         else {
+            print("[getCartoon(\(index))]", "Loading cartoon \(number)")
+            instance.loadCartoon(withNumber: number)
+         }
       }
-      return instance.cartoonModelsArray[index]
+      print("[getCartoon(\(index))]", "Returning nil")
+      return nil
    }
 
    init() {
       baseUrl = "https://xkcd.com/"
       urlSuffix = "info.0.json"
       cartoonModels = Dictionary()
-      cartoonModelsArray = Array()
       cartoonsEvent = Event()
+      dataRequests = Dictionary()
    }
 
    func setup() {
@@ -62,13 +68,6 @@ class CartoonManager {
 
          if let e = err {
             // TODO: Do something?
-
-         } else if let current = cm  {
-            // Update last requested cartoon number
-            s.lastRequestedCartoon = current.number
-
-            // Start fetching more cartoons
-            s.loadNextCartoonBatch()
          }
       }
    }
@@ -90,15 +89,6 @@ class CartoonManager {
       return "\(baseUrl)\(cartoonNumber)\(urlSuffix)"
    }
 
-   private func loadNextCartoonBatch() {
-      guard let index = lastRequestedCartoon else {
-         return
-      }
-      for i in 1...cartoonBathNumber {
-         loadCartoon(withNumber: index - i)
-      }
-   }
-
    // TODO: Store to device as well, then restore on startup
    private func storeCartoon(_ cartoonModel: CartoonModel) {
       // We are dependent on the cartoon number
@@ -110,7 +100,6 @@ class CartoonManager {
          return
       }
       cartoonModels.updateValue(cartoonModel, forKey: number)
-      cartoonModelsArray.append(cartoonModel)
       cartoonsEvent.emit(number)
    }
 
@@ -123,8 +112,9 @@ class CartoonManager {
          lastRequestedCartoon = n
       }
 
-      loadCartoon(withUrl: getCartoonUrl(num)) {
+      let _ = requestCartoon(withNumber: num) {
          [weak self] cm, err in
+
          if let cartoonModel = cm {
             self?.storeCartoon(cartoonModel)
          }
@@ -132,14 +122,33 @@ class CartoonManager {
       }
    }
 
-   private func loadCartoon(withUrl url: String, completion: @escaping (CartoonModel?, Error?) -> Void) {
-      Alamofire.request(url).validate().responseObject { (response: DataResponse<CartoonModel>) in
+   private func requestCartoon(withNumber num: Int?, completion: @escaping (CartoonModel?, Error?) -> Void) -> DataRequest? {
+      let url = getCartoonUrl(num)
+      if let dr = dataRequests[url] {
+         print("requestCartoon (\(num))", "Request processing (\(dr.progress))")
+         return nil
+      }
+      let request = Alamofire.request(url).validate().responseObject {
+         [weak self] (response: DataResponse<CartoonModel>) in
+
          switch response.result {
          case .success:
+            print("requestCartoon (\(num))", "Request success")
             completion(response.result.value, nil)
          case .failure(let error):
+
+            // Only remove request on failure, so that we can make new requests in the future
+            if let s = self,
+               let absoluteUrl = response.request?.url?.absoluteString {
+               s.dataRequests.removeValue(forKey: absoluteUrl)
+            }
+
+            print("requestCartoon (\(num))", "Request failed: \(error)")
             completion(nil, error)
          }
       }
+      print("requestCartoon (\(num))", "Request starting")
+      dataRequests[url] = request
+      return request
    }
 }

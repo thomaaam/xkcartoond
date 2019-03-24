@@ -10,7 +10,8 @@ import EmitterKit
 
 // TODO: Implement the overrides (and then probably some more overrides)
 
-class CartoonContainerVC : UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class CartoonContainerVC : UICollectionViewController,
+      UICollectionViewDelegateFlowLayout, UICollectionViewDataSourcePrefetching {
 
    let inset: CGFloat = 10
    let numColumns: CGFloat = 2
@@ -27,13 +28,15 @@ class CartoonContainerVC : UICollectionViewController, UICollectionViewDelegateF
    override func viewDidLoad() {
       super.viewDidLoad()
 
+      collectionView?.prefetchDataSource = self
       collectionView?.backgroundColor = .white
       collectionView?.register(CartoonViewCell.self, forCellWithReuseIdentifier: CartoonViewCell.key)
 
       cartoonsListener = CartoonManager.instance.cartoonsEvent.on {
          [weak self] cm in
 
-         self?.collectionView.reloadData()
+         print("cartoonsEvent", "Data changed. Count=\(CartoonManager.instance.numCartoons)")
+         self?.collectionView?.reloadData()
       }
    }
 
@@ -49,7 +52,7 @@ class CartoonContainerVC : UICollectionViewController, UICollectionViewDelegateF
    }
 
    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-      return CartoonManager.instance.numCachedCartoons
+      return CartoonManager.instance.numCartoons ?? 0
    }
 
    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -58,5 +61,12 @@ class CartoonContainerVC : UICollectionViewController, UICollectionViewDelegateF
          c.setup(index: indexPath.row)
       }
       return cell
+   }
+
+   func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+      print("Fetch data for these indices: \(indexPaths)")
+      for i in 0..<indexPaths.count {
+         let _ = CartoonManager.getCartoon(fromDictByIndex: indexPaths[i].row)
+      }
    }
 }

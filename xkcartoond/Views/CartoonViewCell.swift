@@ -42,14 +42,17 @@ class CartoonViewCell: UICollectionViewCell {
    }
 
    func setup(index: Int) {
-      guard let cm = CartoonManager.getCartoon(fromArrayWithIndex: index),
+      guard let cm = CartoonManager.getCartoon(fromDictByIndex: index),
             let imgUrl = cm.imgUrl else {
+         print("setup(\(index))", "Cartoon not ready")
+         // TODO: Set placeholder image somehow
          return
       }
       let url = URL(string: imgUrl)!
       //let placeholderImage = UIImage(named: "placeholder")! // TODO
 
       cartoonImage?.af_setImage(withURL: url/*, placeholderImage: placeholderImage*/)
+      print("setup(\(index))", "Set image \(url)")
    }
 }
 
