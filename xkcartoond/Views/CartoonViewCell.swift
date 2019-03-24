@@ -27,8 +27,6 @@ class CartoonViewCell: UICollectionViewCell {
    override init(frame: CGRect) {
       super.init(frame: frame)
 
-      //contentView.backgroundColor = .red
-
       cartoonImage = UIImageView()
       cartoonImage!.contentMode = .scaleAspectFit
 
@@ -38,7 +36,7 @@ class CartoonViewCell: UICollectionViewCell {
          layer.shadowColor = UIColor.black.cgColor
          layer.shadowOffset = CGSize(width: 0, height: elevation)
          layer.shadowRadius = CGFloat(elevation)
-         layer.shadowOpacity = 0.5
+         layer.shadowOpacity = 0.25
       }
 
       contentView.addSubview(cartoonImage!)

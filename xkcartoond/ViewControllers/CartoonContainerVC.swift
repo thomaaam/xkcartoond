@@ -28,7 +28,7 @@ class CartoonContainerVC : UICollectionViewController,
 
       collectionView?.showsVerticalScrollIndicator = false
       collectionView?.prefetchDataSource = self
-      collectionView?.backgroundColor = .lightGray
+      collectionView?.backgroundColor = .white
       collectionView?.register(CartoonViewCell.self, forCellWithReuseIdentifier: CartoonViewCell.key)
 
       cartoonsListener = CartoonManager.instance.cartoonsEvent.on {
