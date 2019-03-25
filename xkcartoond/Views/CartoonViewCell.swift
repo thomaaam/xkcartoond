@@ -8,6 +8,7 @@ import UIKit
 import SnapKit
 import Alamofire
 import AlamofireImage
+import EmitterKit
 
 class CartoonViewCell: UICollectionViewCell {
 
@@ -19,6 +20,8 @@ class CartoonViewCell: UICollectionViewCell {
 
    var cartoonImage: UIImageView?
    let elevation: Int = 10
+   var cartoonListener: EventListener<CartoonModel>
+   var imageListener: EventListener<UIImage>
 
    required init?(coder aDecoder: NSCoder) {
       super.init(coder: aDecoder)
@@ -49,6 +52,7 @@ class CartoonViewCell: UICollectionViewCell {
       }
    }
 
+   /*
    func setup(index: Int) {
       guard let cm = CartoonManager.getCartoon(fromDictByIndex: index),
             let imgUrl = cm.imgUrl,
@@ -58,14 +62,13 @@ class CartoonViewCell: UICollectionViewCell {
          return
       }
       let url = URL(string: imgUrl)!
-      //let placeholderImage = UIImage(named: "placeholder")! // TODO
 
+      //let placeholderImage = UIImage(named: "placeholder")! // TODO
       print("setup(\(index))", "Set image \(url) \(String(describing: cartoonImage))")
 
-      cartoonImage?.af_setImage(withURL: url/*, placeholderImage: placeholderImage*/) {
+      cartoonImage?.af_setImage(withURL: url) {
          [weak self] response in
          // TODO: Manage caching
-         /*
          switch(response.result) {
          case .success(let image):
             StorageManager.instance.storeCartoonImage(byNumber: number, image: image)
@@ -74,8 +77,23 @@ class CartoonViewCell: UICollectionViewCell {
                self?.cartoonImage?.image = cached
             }
          }
-         */
+
       }
+   }
+   */
+
+   func cartoonHandler(_ model: CartoonModel) {
+      // TODO: Subscribe to image
+   }
+
+   func imageHandler(_ image: UIImage) {
+      // TODO: Set image
+   }
+
+   func setup(index: Int) {
+      let cartoonEvent = Event<CartoonModel>()
+      cartoonListener = cartoonEvent.once(self, cartoonHandler)
+      CartoonManager.subscribe(byIndex: index, event: cartoonEvent)
    }
 }
 

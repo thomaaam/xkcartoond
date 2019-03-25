@@ -17,6 +17,7 @@ class CartoonManager {
 
    var cartoonsEvent: Event<Int>
    private var dataRequests: Dictionary<String, DataRequest>
+   private var cartoonEvents: Dictionary<Int, Event<CartoonModel>>
    private(set) var numCartoons: Int?
 
    private static var currentInstance: CartoonManager?
@@ -31,8 +32,7 @@ class CartoonManager {
    }
 
    static func getCartoon(fromDictByIndex index: Int) -> CartoonModel? {
-      if let count = instance.numCartoons {
-         let number = count - index
+      if let number = getNumber(byIndex: index) {
          if let c = StorageManager.instance.getCartoon(byNumber: number) {
             print("[getCartoon(\(index))]", "Returning cached \(number):\(c)")
             return c
@@ -44,6 +44,25 @@ class CartoonManager {
       }
       print("[getCartoon(\(index))]", "Returning nil")
       return nil
+   }
+
+   static func getNumber(byIndex index: Int) -> Int? {
+      if let count = instance.numCartoons {
+         return count - index
+      }
+      return nil
+   }
+
+   static func subscribe(byIndex index: Int, event: Event<CartoonModel>) {
+
+      if let number = getNumber(byIndex: index) {
+         instance.cartoonEvents[number] = event
+
+         // Return it if we have it already
+         if let cm = StorageManager.instance.getCartoon(byNumber: number) {
+            event.emit(cm)
+         }
+      }
    }
 
    init() {
@@ -66,8 +85,11 @@ class CartoonManager {
             self?.trySetupOffline()
          }
          else if let cartoonModel = cm {
+
             // Set the maximum number of existing cartoons
             self?.numCartoons = cartoonModel.number
+
+            self?.cartoonsEvent.emit(cartoonModel.number ?? 0)
 
             // Store another reference to the root cartoon (representing the latest published one)
             StorageManager.instance.storeCartoon(model: cartoonModel,
@@ -101,7 +123,7 @@ class CartoonManager {
          StorageManager.instance.storeCartoon(model: mod)
       }
       // Trigger the data source to reload
-      cartoonsEvent.emit(num)
+      //cartoonsEvent.emit(num)
    }
 
    func loadCartoon(withNumber number: Int?, completion: ((CartoonModel?, Error?) -> Void)? = nil) {
