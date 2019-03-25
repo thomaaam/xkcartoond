@@ -84,11 +84,13 @@ class CartoonViewCell: UICollectionViewCell {
 
    func cartoonHandler(_ model: CartoonModel) {
       // TODO: Subscribe to image
-
+      let imageEvent = Event<UIImage>()
+      imageListener = imageEvent.once(target: self, imageHandler)
+      //ImageManager.subscribe(byIndex: index, event: imageEvent) // TODO
    }
 
    func imageHandler(_ image: UIImage) {
-      // TODO: Set image
+      cartoonImage?.image = image
    }
 
    func setup(index: Int) {
