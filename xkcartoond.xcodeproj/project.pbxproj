@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1D9653C348C258ABB1442A28 /* Pods_xkcartoond.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52399FC03E8617AFDDF95D16 /* Pods_xkcartoond.framework */; };
+		5327E4E404507D67D862916D /* ImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327E473328E8ECA28A2C8FA /* ImageManager.swift */; };
 		5327EB091BF74883FAC26ECE /* CartoonViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327ED50E9AA615894672F46 /* CartoonViewCell.swift */; };
 		5327EB4F1B231C154DB5A7B8 /* CartoonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327ED1C0C389C21E4D3C6DD /* CartoonModel.swift */; };
 		5327EBB4520E48D324B259AB /* CartoonContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327EADA20A8CE6A153D6A04 /* CartoonContainerVC.swift */; };
@@ -36,6 +37,7 @@
 		0AA22F5AAB60D91C04712403 /* Pods-xkcartoondTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xkcartoondTests.release.xcconfig"; path = "Target Support Files/Pods-xkcartoondTests/Pods-xkcartoondTests.release.xcconfig"; sourceTree = "<group>"; };
 		47DEF2861D1B3E4B4329DA05 /* Pods_xkcartoondTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xkcartoondTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52399FC03E8617AFDDF95D16 /* Pods_xkcartoond.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xkcartoond.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5327E473328E8ECA28A2C8FA /* ImageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageManager.swift; sourceTree = "<group>"; };
 		5327EADA20A8CE6A153D6A04 /* CartoonContainerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartoonContainerVC.swift; sourceTree = "<group>"; };
 		5327EC09078F7DFA83391D7A /* CartoonManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartoonManager.swift; sourceTree = "<group>"; };
 		5327ED1C0C389C21E4D3C6DD /* CartoonModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartoonModel.swift; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 			children = (
 				5327EC09078F7DFA83391D7A /* CartoonManager.swift */,
 				5327ED4BDF61F9FE06AE1C87 /* StorageManager.swift */,
+				5327E473328E8ECA28A2C8FA /* ImageManager.swift */,
 			);
 			path = Infrastructure;
 			sourceTree = "<group>";
@@ -380,6 +383,7 @@
 				5327EB091BF74883FAC26ECE /* CartoonViewCell.swift in Sources */,
 				5327EBD79E4FE00053D800DA /* CartoonManager.swift in Sources */,
 				5327EC61D0B9AFAC0459887B /* StorageManager.swift in Sources */,
+				5327E4E404507D67D862916D /* ImageManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

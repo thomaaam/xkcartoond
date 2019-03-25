@@ -8,6 +8,13 @@ import UIKit
 import SnapKit
 import EmitterKit
 
+// TODO:
+// 1. Create ImageDownloader and request/cache images based on prefetch logic
+// 2. Whenever a CartoonViewCell instance sets new data,
+//    set an Emitter that listens for both the current cartoon and the current image.
+// 3. Create an Emitter instance for every downloaded image and cartoon,
+//    then the data will be set as fast as possible for the current cells on screen
+
 class CartoonContainerVC : UICollectionViewController,
       UICollectionViewDelegateFlowLayout, UICollectionViewDataSourcePrefetching {
 
