@@ -84,6 +84,7 @@ class CartoonViewCell: UICollectionViewCell {
 
    func cartoonHandler(_ model: CartoonModel) {
       // TODO: Subscribe to image
+
    }
 
    func imageHandler(_ image: UIImage) {
@@ -92,7 +93,7 @@ class CartoonViewCell: UICollectionViewCell {
 
    func setup(index: Int) {
       let cartoonEvent = Event<CartoonModel>()
-      cartoonListener = cartoonEvent.once(self, cartoonHandler)
+      cartoonListener = cartoonEvent.once(target: self, cartoonHandler)
       CartoonManager.subscribe(byIndex: index, event: cartoonEvent)
    }
 }
