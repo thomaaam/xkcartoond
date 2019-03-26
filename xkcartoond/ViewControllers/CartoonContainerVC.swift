@@ -8,6 +8,15 @@ import UIKit
 import SnapKit
 import EmitterKit
 
+// TODO:
+//    1. When scrolling, make sure to cancel requests that will end in showing an image outside of the screen.
+//       Only focus on the requests that eventually will be presented to the user.
+//       This is really visible when scrolling fast, as we then have to wait for the previous requests to finish
+//          before finally managing the relevant requests that eventually will present cartoons on screen.
+//    2. "Animate to center" animation for clicked cartoons.
+//    3. Add progress bar or placeholder image for cartoons that do not correspond to the requested ones.
+//    4. Eventually implement/design layout for showing cartoon information (like number, date and description)
+
 class CartoonContainerVC : UICollectionViewController,
       UICollectionViewDelegateFlowLayout, UICollectionViewDataSourcePrefetching {
 
