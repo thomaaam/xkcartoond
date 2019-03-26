@@ -4,25 +4,20 @@
 //
 
 import Foundation
+import Alamofire
 import AlamofireImage
+import EmitterKit
 
 class ImageManager {
 
    private static var currentInstance: ImageManager?
 
+   private var imageEvents: Dictionary<String, Event<UIImage>>
    private let imageDownloader: ImageDownloader
 
-   static var instance: ImageManager {
-      get {
-         if let ins = currentInstance {
-            return ins
-         }
-         currentInstance = ImageManager()
-         return currentInstance!
-      }
-   }
+   static let instance = ImageManager()
 
-   init(maximumActiveDownloads: Int = 16) {
+   init(maximumActiveDownloads: Int = 8) {
 
       imageDownloader = ImageDownloader(
             configuration: ImageDownloader.defaultURLSessionConfiguration(),
@@ -30,22 +25,35 @@ class ImageManager {
             maximumActiveDownloads: maximumActiveDownloads,
             imageCache: AutoPurgingImageCache()
       )
+      imageEvents = Dictionary()
    }
 
-   func getImage(url: String, completion: @escaping (UIImage?, Error?) -> Void) -> RequestReceipt? {
-      guard let u = URL(string: url) else {
-         return nil
-      }
+   func subscribe(byUrl url: String?, event: Event<UIImage>) {
+      if let u = url {
+         imageEvents[u] = event
 
-      let req = imageDownloader.download(URLRequest(url: u)) {
-         response in
+         // Set immediately or load and possibly set later
+         loadImage(url: u)
+      }
+   }
+
+   func loadImage(url: String, completion: ((UIImage?, Error?) -> Void)? = nil) {
+      guard let u = URL(string: url) else {
+         return
+      }
+      // Return cached or downloaded image
+      imageDownloader.download(URLRequest(url: u)) {
+         [weak self] (response: DataResponse<Image>) in
          print("getImage(\(u))", response)
 
-         if let image = response.result.value {
-            return
-         }
-      }
+         if let url = response.request?.url?.absoluteString,
+            let image = response.value,
+            let event = self?.imageEvents[url] {
 
-      return req
+            print("getImage(\(u))", "Emit image")
+            event.emit(image)
+         }
+         completion?(response.result.value, response.error)
+      }
    }
 }

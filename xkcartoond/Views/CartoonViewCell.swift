@@ -20,8 +20,8 @@ class CartoonViewCell: UICollectionViewCell {
 
    var cartoonImage: UIImageView?
    let elevation: Int = 10
-   var cartoonListener: EventListener<CartoonModel>
-   var imageListener: EventListener<UIImage>
+   var cartoonListener: EventListener<CartoonModel>?
+   var imageListener: EventListener<UIImage>?
 
    required init?(coder aDecoder: NSCoder) {
       super.init(coder: aDecoder)
@@ -52,41 +52,10 @@ class CartoonViewCell: UICollectionViewCell {
       }
    }
 
-   /*
-   func setup(index: Int) {
-      guard let cm = CartoonManager.getCartoon(fromDictByIndex: index),
-            let imgUrl = cm.imgUrl,
-            let number = cm.number else {
-         print("setup(\(index))", "Cartoon not ready")
-         // TODO: Set placeholder image somehow
-         return
-      }
-      let url = URL(string: imgUrl)!
-
-      //let placeholderImage = UIImage(named: "placeholder")! // TODO
-      print("setup(\(index))", "Set image \(url) \(String(describing: cartoonImage))")
-
-      cartoonImage?.af_setImage(withURL: url) {
-         [weak self] response in
-         // TODO: Manage caching
-         switch(response.result) {
-         case .success(let image):
-            StorageManager.instance.storeCartoonImage(byNumber: number, image: image)
-         case .failure(let error):
-            if let cached = StorageManager.instance.getCartoonImage(byNumber: number) {
-               self?.cartoonImage?.image = cached
-            }
-         }
-
-      }
-   }
-   */
-
    func cartoonHandler(_ model: CartoonModel) {
-      // TODO: Subscribe to image
       let imageEvent = Event<UIImage>()
-      imageListener = imageEvent.once(target: self, imageHandler)
-      //ImageManager.subscribe(byIndex: index, event: imageEvent) // TODO
+      imageListener = imageEvent.on(imageHandler)
+      ImageManager.instance.subscribe(byUrl: model.imgUrl, event: imageEvent)
    }
 
    func imageHandler(_ image: UIImage) {
@@ -95,8 +64,8 @@ class CartoonViewCell: UICollectionViewCell {
 
    func setup(index: Int) {
       let cartoonEvent = Event<CartoonModel>()
-      cartoonListener = cartoonEvent.once(target: self, cartoonHandler)
-      CartoonManager.subscribe(byIndex: index, event: cartoonEvent)
+      cartoonListener = cartoonEvent.on(cartoonHandler)
+      CartoonManager.instance.subscribe(byIndex: index, event: cartoonEvent)
    }
 }
 

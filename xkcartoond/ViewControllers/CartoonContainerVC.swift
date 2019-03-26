@@ -8,19 +8,12 @@ import UIKit
 import SnapKit
 import EmitterKit
 
-// TODO:
-// 1. Create ImageDownloader and request/cache images based on prefetch logic
-// 2. Whenever a CartoonViewCell instance sets new data,
-//    set an Emitter that listens for both the current cartoon and the current image.
-// 3. Create an Emitter instance for every downloaded image and cartoon,
-//    then the data will be set as fast as possible for the current cells on screen
-
 class CartoonContainerVC : UICollectionViewController,
       UICollectionViewDelegateFlowLayout, UICollectionViewDataSourcePrefetching {
 
-   let inset: CGFloat = 10
-   let numColumns: CGFloat = 2
-   var cartoonsListener: EventListener<Int>!
+   private let inset: CGFloat = 10
+   private let numColumns: CGFloat = 2
+   private var cartoonsListener: EventListener<Void>!
 
    required init?(coder aDecoder: NSCoder) {
       super.init(coder: aDecoder)
@@ -38,8 +31,8 @@ class CartoonContainerVC : UICollectionViewController,
       collectionView?.backgroundColor = .white
       collectionView?.register(CartoonViewCell.self, forCellWithReuseIdentifier: CartoonViewCell.key)
 
-      cartoonsListener = CartoonManager.instance.cartoonsEvent.on {
-         [weak self] _ in
+      cartoonsListener = CartoonManager.instance.currentCartoonInit.on {
+         [weak self] in
          DispatchQueue.main.async {
             self?.collectionView?.reloadData()
          }
@@ -73,7 +66,7 @@ class CartoonContainerVC : UICollectionViewController,
    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
       print("Prefetch data for these indices: \(indexPaths)")
       for i in 0..<indexPaths.count {
-         let _ = CartoonManager.getCartoon(fromDictByIndex: indexPaths[i].row)
+         let _ = CartoonManager.instance.loadCartoon(withIndex: indexPaths[i].row)
       }
    }
 }

@@ -10,18 +10,9 @@ class StorageManager {
 
    static let RootCartoonKey = "rootCartoonKey"
 
-   let storage: Storage<CartoonModel>?
+   private let storage: Storage<CartoonModel>?
 
-   private static var currentInstance: StorageManager?
-   static var instance: StorageManager {
-      get {
-         if let ins = currentInstance {
-            return ins
-         }
-         currentInstance = StorageManager()
-         return currentInstance!
-      }
-   }
+   static let instance = StorageManager()
 
    init() {
       let diskConfig = DiskConfig(name: "Floppy")
@@ -60,22 +51,5 @@ class StorageManager {
    }
    func getCartoon(byNumber number: Int) -> CartoonModel? {
       return getCartoon(forKey: String(number))
-   }
-
-   // Store cartoon image to device if it does not exist already
-   func storeCartoonImage(byNumber number: Int, image: UIImage) {
-      if let _ = getCartoonImage(byNumber: number) {
-         return
-      }
-      if let imageStore = storage?.transformImage() {
-         try? imageStore.setObject(image, forKey: String(number))
-      }
-   }
-
-   func getCartoonImage(byNumber number: Int) -> UIImage? {
-      if let imageStore = storage?.transformImage() {
-         return try? imageStore.object(forKey: String(number))
-      }
-      return nil
    }
 }

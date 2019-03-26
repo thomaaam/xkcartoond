@@ -15,61 +15,23 @@ class CartoonManager {
    private let baseUrl: String
    private let urlSuffix: String
 
-   var cartoonsEvent: Event<Int>
+   var currentCartoonInit: Event<Void>
    private var dataRequests: Dictionary<String, DataRequest>
    private var cartoonEvents: Dictionary<Int, Event<CartoonModel>>
-   private(set) var numCartoons: Int?
-
-   private static var currentInstance: CartoonManager?
-   static var instance: CartoonManager {
-      get {
-         if let ins = currentInstance {
-            return ins
-         }
-         currentInstance = CartoonManager()
-         return currentInstance!
+   private(set) var numCartoons: Int? {
+      didSet {
+         currentCartoonInit.emit()
       }
    }
 
-   static func getCartoon(fromDictByIndex index: Int) -> CartoonModel? {
-      if let number = getNumber(byIndex: index) {
-         if let c = StorageManager.instance.getCartoon(byNumber: number) {
-            print("[getCartoon(\(index))]", "Returning cached \(number):\(c)")
-            return c
-         }
-         else {
-            print("[getCartoon(\(index))]", "Loading cartoon \(number)")
-            instance.loadCartoon(withNumber: number)
-         }
-      }
-      print("[getCartoon(\(index))]", "Returning nil")
-      return nil
-   }
-
-   static func getNumber(byIndex index: Int) -> Int? {
-      if let count = instance.numCartoons {
-         return count - index
-      }
-      return nil
-   }
-
-   static func subscribe(byIndex index: Int, event: Event<CartoonModel>) {
-
-      if let number = getNumber(byIndex: index) {
-         instance.cartoonEvents[number] = event
-
-         // Return it if we have it already
-         if let cm = StorageManager.instance.getCartoon(byNumber: number) {
-            event.emit(cm)
-         }
-      }
-   }
+   static let instance = CartoonManager()
 
    init() {
       baseUrl = "https://xkcd.com/"
       urlSuffix = "info.0.json"
-      cartoonsEvent = Event()
+      currentCartoonInit = Event()
       dataRequests = Dictionary()
+      cartoonEvents = Dictionary()
    }
 
    func setup() {
@@ -89,8 +51,6 @@ class CartoonManager {
             // Set the maximum number of existing cartoons
             self?.numCartoons = cartoonModel.number
 
-            self?.cartoonsEvent.emit(cartoonModel.number ?? 0)
-
             // Store another reference to the root cartoon (representing the latest published one)
             StorageManager.instance.storeCartoon(model: cartoonModel,
                   forKey: StorageManager.RootCartoonKey)
@@ -101,8 +61,24 @@ class CartoonManager {
    func trySetupOffline() {
       if let cached = StorageManager.instance.getCartoon(forKey: StorageManager.RootCartoonKey) {
          numCartoons = cached.number
-         cartoonsEvent.emit(cached.number ?? 0) // Manually trigger data source reload
          return
+      }
+   }
+
+   private func getNumber(byIndex index: Int) -> Int? {
+      if let count = numCartoons {
+         return count - index
+      }
+      return nil
+   }
+
+   func subscribe(byIndex index: Int, event: Event<CartoonModel>) {
+
+      if let number = getNumber(byIndex: index) {
+         cartoonEvents[number] = event
+
+         // Set immediately or load and possibly set later
+         loadCartoon(withNumber: number)
       }
    }
 
@@ -122,8 +98,10 @@ class CartoonManager {
       if StorageManager.instance.getCartoon(byNumber: num) == nil {
          StorageManager.instance.storeCartoon(model: mod)
       }
-      // Trigger the data source to reload
-      //cartoonsEvent.emit(num)
+   }
+
+   func loadCartoon(withIndex index: Int) {
+      loadCartoon(withNumber: getNumber(byIndex: index))
    }
 
    func loadCartoon(withNumber number: Int?, completion: ((CartoonModel?, Error?) -> Void)? = nil) {
@@ -137,10 +115,10 @@ class CartoonManager {
          }
 
          // Check if cartoon is stored on disk already
-         if let cartoon = StorageManager.instance.getCartoon(byNumber: num) {
+         if let cm = StorageManager.instance.getCartoon(byNumber: num) {
             print("loadCartoon(\(String(describing: num)))", "Cartoon loaded from storage")
-            storeCartoon(model: cartoon)
-            completion?(cartoon, nil)
+            cartoonEvents[num]?.emit(cm)
+            completion?(cm, nil)
             return
          }
       }
@@ -150,7 +128,14 @@ class CartoonManager {
          [weak self] cm, err in
 
          print("loadCartoon(\((String(describing: number))))", "Cartoon requested")
+
+         // Store it for faster access
          self?.storeCartoon(model: cm)
+
+         // Return it if someone is listening
+         if let num = cm?.number {
+            self?.cartoonEvents[num]?.emit(cm!)
+         }
          completion?(cm, err)
       }
    }
