@@ -20,6 +20,8 @@ import EmitterKit
 class CartoonContainerVC : UICollectionViewController,
       UICollectionViewDelegateFlowLayout, UICollectionViewDataSourcePrefetching {
 
+
+   private var imageContainer: UIView?
    private let inset: CGFloat = 10
    private let numColumns: CGFloat = 2
    private var cartoonsListener: EventListener<Void>!
@@ -35,10 +37,27 @@ class CartoonContainerVC : UICollectionViewController,
    override func viewDidLoad() {
       super.viewDidLoad()
 
-      collectionView?.showsVerticalScrollIndicator = false
-      collectionView?.prefetchDataSource = self
-      collectionView?.backgroundColor = .white
-      collectionView?.register(CartoonViewCell.self, forCellWithReuseIdentifier: CartoonViewCell.key)
+      if let cv = collectionView {
+         cv.showsVerticalScrollIndicator = false
+         cv.prefetchDataSource = self
+         cv.backgroundColor = .white
+         cv.register(CartoonViewCell.self, forCellWithReuseIdentifier: CartoonViewCell.key)
+      }
+
+      // TODO: Make extension function to deal with safe area insets
+      let sa = UIApplication.shared.delegate?.window??.safeAreaInsets
+      let bottomOffset = sa?.bottom ?? 0
+      let topOffset = (sa?.top ?? 0) + (navigationController?.navigationBar.bounds.height ?? 0)
+      let ic = UIView()
+      ic.isUserInteractionEnabled = false
+      view.addSubview(ic)
+      ic.snp.makeConstraints {
+         m in
+         m.left.width.equalToSuperview()
+         m.top.equalToSuperview().offset(topOffset)
+         m.bottom.equalToSuperview().offset(-bottomOffset)
+      }
+      imageContainer = ic
 
       cartoonsListener = CartoonManager.instance.currentCartoonInit.on {
          [weak self] in
@@ -46,6 +65,38 @@ class CartoonContainerVC : UICollectionViewController,
             self?.collectionView?.reloadData()
          }
       }
+   }
+
+   private func animate(imageView: UIImageView?) {
+
+      guard let container = imageContainer,
+            let imgView = imageView,
+            let img = imgView.image else {
+         return
+      }
+
+      container.layoutIfNeeded()
+
+      var animatedView = UIImageView(image: img)
+      animatedView.frame = container.convert(imgView.frame, from: imgView.coordinateSpace)
+      animatedView.contentMode = .scaleAspectFit
+
+      container.addSubview(animatedView)
+
+      animatedView.snp.makeConstraints {
+         m in
+         m.center.equalToSuperview()
+         m.width.equalTo(imgView.bounds.width * 2)
+         m.height.equalTo(imgView.bounds.height * 2)
+      }
+
+      container.setNeedsUpdateConstraints()
+
+      UIView.animate(withDuration: 0.5, animations: {
+         //animatedView.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi / 2))
+         container.layoutIfNeeded()
+
+      })
    }
 
    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
@@ -76,6 +127,13 @@ class CartoonContainerVC : UICollectionViewController,
       print("Prefetch data for these indices: \(indexPaths)")
       for i in 0..<indexPaths.count {
          let _ = CartoonManager.instance.loadCartoon(withIndex: indexPaths[i].row)
+      }
+   }
+
+   override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+      if let c = collectionView.cellForItem(at: indexPath) as? CartoonViewCell {
+         print("didSelectItemAt(\(indexPath.row))")
+         animate(imageView: c.cartoonImage)
       }
    }
 }
