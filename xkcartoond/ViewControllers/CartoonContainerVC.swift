@@ -20,11 +20,11 @@ import EmitterKit
 class CartoonContainerVC : UICollectionViewController,
       UICollectionViewDelegateFlowLayout, UICollectionViewDataSourcePrefetching {
 
-
-   private var imageContainer: UIView?
    private let inset: CGFloat = 10
    private let numColumns: CGFloat = 2
    private var cartoonsListener: EventListener<Void>!
+
+   private var imageContainer: UIView?
    private var animatedImageView: UIImageView?
 
    required init?(coder aDecoder: NSCoder) {
@@ -45,19 +45,27 @@ class CartoonContainerVC : UICollectionViewController,
          cv.register(CartoonViewCell.self, forCellWithReuseIdentifier: CartoonViewCell.key)
       }
 
-      // TODO: Make extension function to deal with safe area insets
-      let sa = UIApplication.shared.delegate?.window??.safeAreaInsets
-      let topOffset = (sa?.top ?? 0) + (navigationController?.navigationBar.bounds.height ?? 0)
-      let ic = UIView()
-      ic.isUserInteractionEnabled = false
-      view.addSubview(ic)
-      ic.snp.makeConstraints {
+      let container = UIView()
+      container.isUserInteractionEnabled = false
+
+      let overlay = UIView()
+      overlay.alpha = 0
+      overlay.backgroundColor = UIColor(white: 0.9, alpha: 0.9)
+      container.addSubview(overlay)
+      overlay.snp.makeConstraints {
+         m in
+         m.left.top.height.width.equalToSuperview()
+      }
+
+      view.addSubview(container)
+      container.snp.makeConstraints {
          m in
          m.left.width.equalToSuperview()
-         m.top.equalToSuperview().offset(topOffset)
+         m.top.equalToSuperview().offset(topSafeArea + (navigationController?.navigationBar.bounds.height ?? 0))
          m.bottom.equalToSuperview()
       }
-      imageContainer = ic
+
+      imageContainer = container
 
       cartoonsListener = CartoonManager.instance.currentCartoonInit.on {
          [weak self] in
@@ -69,7 +77,8 @@ class CartoonContainerVC : UICollectionViewController,
 
    private func animateFromCenter() {
       if let container = imageContainer,
-         let cartoonView = container.subviews.first,
+         let overlay = container.subviews.first,
+         let cartoonView = container.subviews.first(where: { view in view is UIImageView }),
          let imgView = animatedImageView {
 
          // Convert back to the cartoon element's frame
@@ -77,6 +86,7 @@ class CartoonContainerVC : UICollectionViewController,
 
          UIView.animate(withDuration: 0.5, animations: {
             cartoonView.frame = frame
+            overlay.alpha = 0
          }, completion: {
             _ in
             cartoonView.removeFromSuperview()
@@ -89,6 +99,7 @@ class CartoonContainerVC : UICollectionViewController,
    private func animateToCenter(imageView: UIImageView?) {
 
       guard let container = imageContainer,
+            let overlay = container.subviews.first,
             let imgView = imageView,
             let img = imgView.image else {
          return
@@ -109,11 +120,8 @@ class CartoonContainerVC : UICollectionViewController,
 
       animatedView.snp.makeConstraints {
          m in
-         m.centerX.equalToSuperview()
-         // Place center on top of bottom safe area
-         m.centerY.equalToSuperview().offset(-(UIApplication.shared.delegate?.window??.safeAreaInsets.bottom ?? 0))
-         m.width.equalToSuperview().inset(inset)
-         m.height.equalToSuperview().inset(inset)
+         m.left.top.right.equalToSuperview().inset(inset)
+         m.bottom.equalToSuperview().inset(inset + bottomSafeArea)
       }
 
       container.setNeedsUpdateConstraints()
@@ -121,6 +129,7 @@ class CartoonContainerVC : UICollectionViewController,
       UIView.animate(withDuration: 0.5, animations: {
          //animatedView.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi / 2))
          container.layoutIfNeeded()
+         overlay.alpha = 1
       }, completion: {
          _ in
          // Add the tap recognizer when the animation is completed,

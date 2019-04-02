@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1D9653C348C258ABB1442A28 /* Pods_xkcartoond.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52399FC03E8617AFDDF95D16 /* Pods_xkcartoond.framework */; };
+		5327E4344CA0B57463B256EE /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327EDD1C276737CD7705AE8 /* UIViewController.swift */; };
 		5327E4E404507D67D862916D /* ImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327E473328E8ECA28A2C8FA /* ImageManager.swift */; };
 		5327EB091BF74883FAC26ECE /* CartoonViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327ED50E9AA615894672F46 /* CartoonViewCell.swift */; };
 		5327EB4F1B231C154DB5A7B8 /* CartoonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327ED1C0C389C21E4D3C6DD /* CartoonModel.swift */; };
@@ -43,6 +44,7 @@
 		5327ED1C0C389C21E4D3C6DD /* CartoonModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartoonModel.swift; sourceTree = "<group>"; };
 		5327ED4BDF61F9FE06AE1C87 /* StorageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		5327ED50E9AA615894672F46 /* CartoonViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartoonViewCell.swift; sourceTree = "<group>"; };
+		5327EDD1C276737CD7705AE8 /* UIViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
 		6DDC3D4938DA2931FB32C042 /* Pods-xkcartoond.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xkcartoond.debug.xcconfig"; path = "Target Support Files/Pods-xkcartoond/Pods-xkcartoond.debug.xcconfig"; sourceTree = "<group>"; };
 		ADA90AD222456B3700CA1FC8 /* xkcartoond.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xkcartoond.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADA90AD522456B3700CA1FC8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -87,13 +89,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		5327E118018D6F191E934C77 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
 		5327E25839D4D898C80BCEF8 /* Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
@@ -118,6 +113,14 @@
 				5327ED1C0C389C21E4D3C6DD /* CartoonModel.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		5327EBD86B54A69165B2E8CF /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				5327EDD1C276737CD7705AE8 /* UIViewController.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		5327ED26663B0F5E844F4E57 /* Views */ = {
@@ -159,9 +162,9 @@
 				ADA90ADC22456B3700CA1FC8 /* xkcartoond.xcdatamodeld */,
 				5327E9828313D2CF78578CD3 /* ViewControllers */,
 				5327ED26663B0F5E844F4E57 /* Views */,
-				5327E118018D6F191E934C77 /* Extensions */,
 				5327EA0BCB8632314CB9053A /* Models */,
 				5327E25839D4D898C80BCEF8 /* Infrastructure */,
+				5327EBD86B54A69165B2E8CF /* Extensions */,
 			);
 			path = xkcartoond;
 			sourceTree = "<group>";
@@ -384,6 +387,7 @@
 				5327EBD79E4FE00053D800DA /* CartoonManager.swift in Sources */,
 				5327EC61D0B9AFAC0459887B /* StorageManager.swift in Sources */,
 				5327E4E404507D67D862916D /* ImageManager.swift in Sources */,
+				5327E4344CA0B57463B256EE /* UIViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
