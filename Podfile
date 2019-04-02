@@ -9,10 +9,10 @@ target 'xkcartoond' do
 
   # Pods for xkcartoond
   pod 'SnapKit', '~> 4.0'
-  pod 'Alamofire', '~> 4.8.0'
-  pod 'AlamofireImage'
-  pod 'AlamofireObjectMapper'
-  pod 'Kingfisher'
+  pod 'Alamofire', '~> 4.8'
+  pod 'AlamofireImage', '~> 3.5.2'
+  pod 'AlamofireObjectMapper', '~>5.2.0'
+  pod 'Kingfisher', '>= 5.3.1'
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'EmitterKit'
   pod 'Cache'

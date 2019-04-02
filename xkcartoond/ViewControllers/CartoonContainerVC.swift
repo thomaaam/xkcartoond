@@ -77,17 +77,19 @@ class CartoonContainerVC : UICollectionViewController,
 
       container.layoutIfNeeded()
 
-      var animatedView = UIImageView(image: img)
+      let animatedView = UIImageView(image: img)
+      animatedView.backgroundColor = .red
       animatedView.frame = container.convert(imgView.frame, from: imgView.coordinateSpace)
       animatedView.contentMode = .scaleAspectFit
-
+      // TODO
+      //animatedView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(_:))))
       container.addSubview(animatedView)
 
       animatedView.snp.makeConstraints {
          m in
          m.center.equalToSuperview()
-         m.width.equalTo(imgView.bounds.width * 2)
-         m.height.equalTo(imgView.bounds.height * 2)
+         m.width.equalToSuperview().inset(inset)
+         m.height.equalToSuperview().inset(inset)
       }
 
       container.setNeedsUpdateConstraints()
@@ -97,6 +99,12 @@ class CartoonContainerVC : UICollectionViewController,
          container.layoutIfNeeded()
 
       })
+   }
+
+   func handleTap(sender: UITapGestureRecognizer) {
+      if sender.state == .ended {
+         // handling code
+      }
    }
 
    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
