@@ -13,7 +13,7 @@ import EmitterKit
 //       Only focus on the requests that eventually will be presented to the user.
 //       This is really visible when scrolling fast, as we then have to wait for the previous requests to finish
 //          before finally managing the relevant requests that eventually will present cartoons on screen.
-//    2. "Animate to center" animation for clicked cartoons.
+//    (√) 2. "Animate to center" animation for clicked cartoons.
 //    3. Add progress bar or placeholder image for cartoons that do not correspond to the requested ones.
 //    4. Eventually implement/design layout for showing cartoon information (like number, date and description)
 
@@ -25,6 +25,7 @@ class CartoonContainerVC : UICollectionViewController,
    private let inset: CGFloat = 10
    private let numColumns: CGFloat = 2
    private var cartoonsListener: EventListener<Void>!
+   private var animatedImageView: UIImageView?
 
    required init?(coder aDecoder: NSCoder) {
       super.init(coder: aDecoder)
@@ -46,7 +47,6 @@ class CartoonContainerVC : UICollectionViewController,
 
       // TODO: Make extension function to deal with safe area insets
       let sa = UIApplication.shared.delegate?.window??.safeAreaInsets
-      let bottomOffset = sa?.bottom ?? 0
       let topOffset = (sa?.top ?? 0) + (navigationController?.navigationBar.bounds.height ?? 0)
       let ic = UIView()
       ic.isUserInteractionEnabled = false
@@ -55,7 +55,7 @@ class CartoonContainerVC : UICollectionViewController,
          m in
          m.left.width.equalToSuperview()
          m.top.equalToSuperview().offset(topOffset)
-         m.bottom.equalToSuperview().offset(-bottomOffset)
+         m.bottom.equalToSuperview()
       }
       imageContainer = ic
 
@@ -67,7 +67,26 @@ class CartoonContainerVC : UICollectionViewController,
       }
    }
 
-   private func animate(imageView: UIImageView?) {
+   private func animateFromCenter() {
+      if let container = imageContainer,
+         let cartoonView = container.subviews.first,
+         let imgView = animatedImageView {
+
+         // Convert back to the cartoon element's frame
+         let frame = container.convert(imgView.frame, from: imgView.coordinateSpace)
+
+         UIView.animate(withDuration: 0.5, animations: {
+            cartoonView.frame = frame
+         }, completion: {
+            _ in
+            cartoonView.removeFromSuperview()
+            // Make sure that you can interact with the cartoon elements again
+            container.isUserInteractionEnabled = false
+         })
+      }
+   }
+
+   private func animateToCenter(imageView: UIImageView?) {
 
       guard let container = imageContainer,
             let imgView = imageView,
@@ -75,19 +94,24 @@ class CartoonContainerVC : UICollectionViewController,
          return
       }
 
+      animatedImageView = imgView
+
+      container.isUserInteractionEnabled = true
       container.layoutIfNeeded()
 
+      let tgr = UITapGestureRecognizer(target: self, action: #selector(handleTap(tgr:)))
       let animatedView = UIImageView(image: img)
-      animatedView.backgroundColor = .red
+      // Convert the frame to the center of the container, then animate it
       animatedView.frame = container.convert(imgView.frame, from: imgView.coordinateSpace)
       animatedView.contentMode = .scaleAspectFit
-      // TODO
-      //animatedView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(_:))))
+
       container.addSubview(animatedView)
 
       animatedView.snp.makeConstraints {
          m in
-         m.center.equalToSuperview()
+         m.centerX.equalToSuperview()
+         // Place center on top of bottom safe area
+         m.centerY.equalToSuperview().offset(-(UIApplication.shared.delegate?.window??.safeAreaInsets.bottom ?? 0))
          m.width.equalToSuperview().inset(inset)
          m.height.equalToSuperview().inset(inset)
       }
@@ -97,13 +121,18 @@ class CartoonContainerVC : UICollectionViewController,
       UIView.animate(withDuration: 0.5, animations: {
          //animatedView.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi / 2))
          container.layoutIfNeeded()
-
+      }, completion: {
+         _ in
+         // Add the tap recognizer when the animation is completed,
+         //    so that all interaction fails until it is time
+         container.addGestureRecognizer(tgr)
       })
    }
 
-   func handleTap(sender: UITapGestureRecognizer) {
-      if sender.state == .ended {
-         // handling code
+   @objc
+   func handleTap(tgr: UITapGestureRecognizer) {
+      if tgr.state == .ended {
+         animateFromCenter()
       }
    }
 
@@ -141,7 +170,7 @@ class CartoonContainerVC : UICollectionViewController,
    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
       if let c = collectionView.cellForItem(at: indexPath) as? CartoonViewCell {
          print("didSelectItemAt(\(indexPath.row))")
-         animate(imageView: c.cartoonImage)
+         animateToCenter(imageView: c.cartoonImage)
       }
    }
 }

@@ -6,7 +6,7 @@
 //  Copyright © 2019 Thomas Amundsen. All rights reserved.
 //
 
-import SnapKit
+
 import UIKit
 
 class RootViewController: UINavigationController {
