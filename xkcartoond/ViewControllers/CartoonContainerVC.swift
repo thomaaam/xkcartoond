@@ -16,12 +16,17 @@ import EmitterKit
 //    (√) 2. "Animate to center" animation for clicked cartoons.
 //    3. Add progress bar or placeholder image for cartoons that do not correspond to the requested ones.
 //    4. Eventually implement/design layout for showing cartoon information (like number, date and description)
+//    (DOING) 5. Implement functionality for adjusting number of items (in width) when doing a zoom in/out gesture.
 
 class CartoonContainerVC : UICollectionViewController,
       UICollectionViewDelegateFlowLayout, UICollectionViewDataSourcePrefetching {
 
    private let inset: CGFloat = 10
-   private let numColumns: CGFloat = 2
+
+   private let minColumns: CGFloat = 1
+   private let maxColumns: CGFloat = 4
+   private var numColumns: CGFloat = 2 // Current number of elements (in width)
+
    private var cartoonsListener: EventListener<Void>!
 
    private var imageContainer: UIView?
@@ -73,6 +78,11 @@ class CartoonContainerVC : UICollectionViewController,
             self?.collectionView?.reloadData()
          }
       }
+
+      // FIXME. Just temp for testing.
+      // TODO: Should adjust number of elements by doing a zoom in/out touch gesture
+      navigationController?.navigationBar.addGestureRecognizer(
+            UITapGestureRecognizer(target: self, action: #selector(adjustElementSizeInWidth(tgr:))))
    }
 
    private func animateFromCenter() {
@@ -136,6 +146,20 @@ class CartoonContainerVC : UICollectionViewController,
          //    so that all interaction fails until it is time
          container.addGestureRecognizer(tgr)
       })
+   }
+
+
+   // FIXME: Just temp for testing changing number of elements (in width)
+   @objc
+   func adjustElementSizeInWidth(tgr: UITapGestureRecognizer) {
+      if tgr.state == .ended {
+         if numColumns == maxColumns {
+            numColumns = minColumns
+         } else {
+            numColumns += 1
+         }
+         collectionView?.reloadData()
+      }
    }
 
    @objc
