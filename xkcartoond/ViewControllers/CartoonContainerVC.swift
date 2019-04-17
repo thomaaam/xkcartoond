@@ -9,7 +9,7 @@ import SnapKit
 import EmitterKit
 
 // TODO:
-//    1. When scrolling, make sure to cancel requests that will end in showing an image outside of the screen.
+//    (√) 1. When scrolling, make sure to cancel requests that will end in showing an image outside of the screen.
 //       Only focus on the requests that eventually will be presented to the user.
 //       This is really visible when scrolling fast, as we then have to wait for the previous requests to finish
 //          before finally managing the relevant requests that eventually will present cartoons on screen.
@@ -181,5 +181,10 @@ class CartoonContainerVC : UICollectionViewController,
          print("didSelectItemAt(\(indexPath.row))")
          animateToCenter(imageView: c.cartoonImage)
       }
+   }
+
+   override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+      print("didEndDisplaying(\(String(describing: indexPath.row)))")
+      CartoonManager.instance.unsubscribe(byIndex: indexPath.row)
    }
 }

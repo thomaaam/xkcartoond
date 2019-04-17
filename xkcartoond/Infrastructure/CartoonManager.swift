@@ -72,8 +72,16 @@ class CartoonManager {
       return nil
    }
 
-   func subscribe(byIndex index: Int, event: Event<CartoonModel>) {
+   func unsubscribe(byIndex index: Int) {
+      if let number = getNumber(byIndex: index) {
+         cartoonEvents.removeValue(forKey: number)
 
+         // Cancel request immediately, as we won't show it anyways
+         removeRequest(withUrl: getCartoonUrl(number))
+      }
+   }
+
+   func subscribe(byIndex index: Int, event: Event<CartoonModel>) {
       if let number = getNumber(byIndex: index) {
          cartoonEvents[number] = event
 
@@ -154,19 +162,28 @@ class CartoonManager {
             print("requestCartoon (\((String(describing: num))))", "Request success")
             completion(response.result.value, nil)
          case .failure(let error):
-
-            // Only remove request on failure, so that we can make new requests in the future
-            if let s = self,
-               let absoluteUrl = response.request?.url?.absoluteString {
-               s.dataRequests.removeValue(forKey: absoluteUrl)
-            }
-
             print("requestCartoon (\((String(describing: num))))", "Request failed: \(error)")
+            self?.removeRequest(withUrl: response.request?.url?.absoluteString)
             completion(nil, error)
          }
       }
       print("requestCartoon (\((String(describing: num))))", "Request starting")
       dataRequests[url] = request
       return request
+   }
+
+   private func removeRequest(withUrl url: String?) {
+      guard let u = url else { return }
+
+      // Cancel if ongoing
+      if let req = dataRequests[u] {
+         if !req.progress.isFinished {
+            print("removeRequest(\(u)): Cancel")
+            req.cancel()
+         }
+      }
+      // Remove request from cache, so that we can make a new one in the future
+      print("removeRequest(\(u)): Remove")
+      dataRequests.removeValue(forKey: u)
    }
 }
